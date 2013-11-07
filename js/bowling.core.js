@@ -3,7 +3,6 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
 
     var core = (function (window, _, undefined) {
 
-
         var isStrikeFrame = function (acc, item) {
             return item.length === 1 && sum(item) === 10;
         };
@@ -53,17 +52,17 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
             if(spareFrame) { return "spare"; }
 
         },{
-            strike: function(acc, item) {
+            strike: function (acc, item) {
                 acc = processPendingThrows(acc, item);
                 acc.strikes.push(10);
                 return acc;
             },
-            spare: function(acc, item) {
+            spare: function (acc, item) {
                 acc = processPendingThrows(acc, item);
                 acc.spare = 10;
                 return acc;
             },
-            default: function(acc, item) {
+            default: function (acc, item) {
                 acc = processPendingThrows(acc, item);
                 acc.frameTotals.push(scoreThusFar(acc, item) + sum(item));
                 return acc;
@@ -88,24 +87,60 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
             return _.reduce(incoming, throwTotaler, initialAccumulator).frameTotals;
         };
 
+        var throwGrouper = multimethod(function (args) {
+            var acc = args[0];
+
+            if(acc.grouped.length === 9) { return "lastFrame"; }
+            if(acc.partial.length === 2) { return "doublet"; }
+            if(acc.partial.length === 1) { return "singlet"; }
+
+        },{
+            lastFrame: function (acc, item, index, coll) {
+                acc.partial.push(item);
+                if(index === coll.length - 1) {
+                    acc = pushPartialIntoGrouped(acc);
+                }
+                return acc;
+            },
+            doublet: function (acc, item, index, coll) {
+                acc = pushPartialIntoGrouped(acc);
+                acc.partial.push(item);
+                return checkEndOfLine(acc, item, index, coll);
+            },
+            singlet: function (acc, item, index, coll) {
+                if (acc.partial[0] === 10) {
+                    acc = pushPartialIntoGrouped(acc);
+                }
+                acc.partial.push(item);
+                return checkEndOfLine(acc, item, index, coll);
+            },
+            default: function (acc, item, index, coll) {
+                acc.partial.push(item);
+                return checkEndOfLine(acc, item, index, coll);
+            }
+        });
+
+        var pushPartialIntoGrouped = function (acc) {
+            acc.grouped.push(acc.partial);
+            acc.partial = [];
+            return acc;
+        };
+
+        var checkEndOfLine = function (acc, item, index, coll) {
+            if(index === coll.length - 1)
+            {
+                acc = pushPartialIntoGrouped(acc);
+            }
+            return acc;
+        };
+
         var groupThrows = function(incoming) {
             var initialAccumulator = {
                 grouped: [],
                 partial: []
-            },
-            acc = _.reduce(incoming, function(acc, item, index) {
-                acc.partial.push(item);
-                if(acc.partial.length === 2) {
-                    acc.grouped.push(acc.partial);
-                    acc.partial = [];
-                } else if(acc.partial.length === 1 && (acc.partial[0] === 10 || index === incoming.length - 1)) {
-                    acc.grouped.push(acc.partial);
-                    acc.partial = [];
-                }
-                return acc;
-            }, initialAccumulator);
+            };
 
-            return acc.grouped;
+            return _.reduce(incoming, throwGrouper, initialAccumulator).grouped;
         };
 
         return {

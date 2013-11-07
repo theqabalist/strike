@@ -23,6 +23,11 @@ describe("bowling.vm", function () {
             frameSet[1] = {first: "3", second: "4"};
             expect(bowling.vm.frameSetToThrows(frameSet)).toEqual([1,2,3,4]);
         });
+
+        it("should be able to convert frames with totals greater than 10 to 10 max.", function () {
+            frameSet[0] = {first: "9", second: "9"};
+            expect(bowling.vm.frameSetToThrows(frameSet)).toEqual([9,1]);
+        });
     });
 
     describe("bowling.vm.frameIsAStrike", function () {

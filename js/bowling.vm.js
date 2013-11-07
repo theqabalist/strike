@@ -29,6 +29,10 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
                 if(frame.second !== "/") {
                     frame.second = parseInt(frame.second, 10) || undefined;
                 }
+                if(frame.first + frame.second > 10)
+                {
+                    frame.second = 10 - frame.first;
+                }
 
                 return [frame.first, frame.second];
             });

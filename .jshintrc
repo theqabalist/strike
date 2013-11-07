@@ -1,0 +1,21 @@
+{
+    "globals": {
+        "console": true,
+
+        "angular": true,
+        "module": true,
+        "inject": true,
+
+        "_": true,
+
+        "beforeEach": true,
+        "describe": true,
+        "it": true,
+        "expect": true,
+        "spyOn": true,
+
+        "multimethods": true,
+        "multimethod": true,
+        "bowling": true
+    }
+}

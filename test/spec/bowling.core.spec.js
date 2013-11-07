@@ -29,6 +29,11 @@ describe("bowling.core", function () {
             scores: [9,0,10,5,5],
             totals: [9,29]
         },
+        irregularTenthFrame: {
+            scores: [10,10,10,10,10,10,10,10,10,10,10,10],
+            totals: [30,60,90,120,150,180,210,240,270,300],
+            groups: [[10],[10],[10],[10],[10],[10],[10],[10],[10],[10,10,10]]
+        },
         qaTest1: {
             scores: [10,10,10],
             totals: [30]
