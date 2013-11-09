@@ -17,8 +17,8 @@ app.controller("SheetViewModel", function ($scope) {
     };
 
     var frameSetComputeLoop = function (frameSet) {
-        var totals1 = bowling.vm.frameSetToThrows(frameSet),
-            totals = bowling.core.convertThrowsToTotals(totals1);
+        var throws_ = bowling.vm.frameSetToThrows(frameSet),
+            totals = bowling.core.convertThrowsToTotals(throws_);
 
         return bowling.vm.recombineFramesWithNewTotals(frameSet, totals);
     };

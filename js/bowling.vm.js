@@ -13,47 +13,81 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
 
         var frameSetToThrows = function (frameset) {
             var nestedScores = framesToScoreGroups(frameset),
-                flattenedScores = _.flatten(nestedScores),
-                scoresAsStrings = _.take(flattenedScores, _.indexOf(flattenedScores, undefined)),
-                scores = specialCharactersToNumbers(scoresAsStrings);
+                numericGroups = specialCharactersToNumbers(nestedScores),
+                correctedGroups = correctExcessiveGroups(numericGroups),
+                flattenedScores = _.flatten(correctedGroups),
+                scores = _.take(flattenedScores, _.findIndex(flattenedScores, function (item) {
+                    return _.isNaN(item) || _.isUndefined(item); }));
                 return scores;
         };
 
         var framesToScoreGroups = function (frameset) {
             return _.map(frameset, function (frame) {
-                if(frame.first !== "x" && frame.first !== "X") {
-                    frame.first = parseInt(frame.first, 10) || undefined;
-                } else {
-                    return [frame.first];
+                var frameGroup = [];
+                frameGroup.push(frame.first);
+                if(isStrikeChar(frame.first)) {
+                    return frameGroup;
                 }
-                if(frame.second !== "/") {
-                    frame.second = parseInt(frame.second, 10) || undefined;
-                }
-                if(frame.first + frame.second > 10)
-                {
-                    frame.second = 10 - frame.first;
-                }
-
-                return [frame.first, frame.second];
+                frameGroup.push(frame.second);
+                return frameGroup;
             });
         };
 
-        var specialCharactersToNumbers = function (scoreStrings) {
-            return _.map(scoreStrings, function (score, index) {
-                if(score === "/") { score = 10 - parseInt(scoreStrings[index-1], 10); }
-                if(score === "x" || score === "X") { score = 10; }
-                return parseInt(score, 10);
+        var isStrikeChar = function (string) {
+            return string === "x" ||
+                   string === "X";
+        };
+
+        var specialCharactersToNumbers = function (frameGroups) {
+            return _.map(frameGroups, function (group) {
+                var firstNum = parseInt(group[0], 10),
+                    secondNum = parseInt(group[1], 10);
+
+                if(isStrikeChar(group[0])) {
+                    return [10];
+                }
+                if(isSpareChar(group[1])) {
+                    return [firstNum, 10-firstNum];
+                }
+                return [firstNum, secondNum];
+            });
+        };
+
+        var isSpareChar = function (string) { return string === "/"; };
+
+        var correctExcessiveGroups = function (frameGroups) {
+            return _.map(frameGroups, function (group) {
+                var first = group[0],
+                    second = group[1];
+
+                if(first + second > 10) {
+                    return [first, 10 - first];
+                } else {
+                    return group;
+                }
             });
         };
 
         var recombineFramesWithNewTotals = function (frameSet, totals) {
             return _.map(frameSet, function (frame, index) {
+                var first = parseInt(frame.first, 10),
+                    second = parseInt(frame.second, 10);
+
+                if (first + second >= 10 && !isStrikeChar(first)){
+                    second = "/";
+                }
                 return {
-                    first: frame.first,
-                    second: frame.second,
+                    first: first || disallowAllButSpecialChars(frame.first),
+                    second: second || disallowAllButSpecialChars(frame.second),
                     total: totals[index]
                 };
             });
+        };
+
+        var disallowAllButSpecialChars = function (string) {
+            if(isStrikeChar(string) || isSpareChar(string) || !_.isNaN(parseInt(string, 10))) {
+                return string;
+            }
         };
 
         var currentFrameInFrameSet = function (frameSet) {

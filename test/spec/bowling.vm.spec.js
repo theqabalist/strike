@@ -11,7 +11,7 @@ describe("bowling.vm", function () {
         });
     });
 
-    describe("bowling.vm.viewModelToThrows", function () {
+    describe("bowling.vm.frameSetToThrows", function () {
         var frameSet;
 
         beforeEach(function () {
@@ -27,6 +27,11 @@ describe("bowling.vm", function () {
         it("should be able to convert frames with totals greater than 10 to 10 max.", function () {
             frameSet[0] = {first: "9", second: "9"};
             expect(bowling.vm.frameSetToThrows(frameSet)).toEqual([9,1]);
+        });
+
+        it("should be able to handle 0s gracefully.", function () {
+            frameSet[0] = {first: "0", second: "/"};
+            expect(bowling.vm.frameSetToThrows(frameSet)).toEqual([0,10]);
         });
     });
 

@@ -12,15 +12,14 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
         };
 
         var processPendingStrikes = function (acc, item) {
-
             if(acc.strikes.length === 2)
             {
-                acc.frameTotals.push(scoreThusFar(acc, item) + item[0] + sum(acc.strikes));
+                acc.frameTotals.push(scoreThusFar(acc) + item[0] + sum(acc.strikes));
                 acc.strikes = _.rest(acc.strikes);
             } else if(acc.strikes.length === 1) {
                 if(!isStrikeFrame(acc, item))
                 {
-                    acc.frameTotals.push(scoreThusFar(acc, item) + sum(item) + sum(acc.strikes));
+                    acc.frameTotals.push(scoreThusFar(acc) + sum(item) + sum(acc.strikes));
                     acc.strikes = _.rest(acc.strikes);
                 }
             }
@@ -29,7 +28,7 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
 
         var processPendingSpare = function (acc, item) {
             if(acc.spare) {
-                acc.frameTotals.push(scoreThusFar(acc,item) + item[0] + acc.spare);
+                acc.frameTotals.push(scoreThusFar(acc) + item[0] + acc.spare);
                 acc.spare = 0;
             }
 
@@ -48,10 +47,21 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
                 currentItemTotal = sum(item),
                 spareFrame = item.length === 2 && currentItemTotal === 10;
 
+            if(item.length > 2) { return "irregular"; }
             if(isStrikeFrame(acc, item)) { return "strike"; }
             if(spareFrame) { return "spare"; }
 
         },{
+            irregular: function (acc, item) {
+                _.forEach(acc.strikes, function (strike, index, strikes) {
+                    var valueToAdd = 10*(strikes.length - index);
+
+                    acc.frameTotals.push(scoreThusFar(acc) + valueToAdd + sum(_.take(item,index+1)));
+                });
+                acc = processPendingSpare(acc, item);
+                acc.frameTotals.push(scoreThusFar(acc) + sum(item));
+                return acc;
+            },
             strike: function (acc, item) {
                 acc = processPendingThrows(acc, item);
                 acc.strikes.push(10);
@@ -64,7 +74,7 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
             },
             default: function (acc, item) {
                 acc = processPendingThrows(acc, item);
-                acc.frameTotals.push(scoreThusFar(acc, item) + sum(item));
+                acc.frameTotals.push(scoreThusFar(acc) + sum(item));
                 return acc;
             }
         });
