@@ -41,10 +41,8 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
             return acc;
         };
 
-        var throwTotaler = multimethod(function (args) {
-            var acc = args[0],
-                item = args[1],
-                currentItemTotal = sum(item),
+        var throwTotaler = multimethod(function (acc, item) {
+            var currentItemTotal = sum(item),
                 spareFrame = item.length === 2 && currentItemTotal === 10;
 
             if(item.length > 2) { return "irregular"; }
@@ -97,9 +95,7 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
             return _.reduce(incoming, throwTotaler, initialAccumulator).frameTotals;
         };
 
-        var throwGrouper = multimethod(function (args) {
-            var acc = args[0];
-
+        var throwGrouper = multimethod(function (acc) {
             if(acc.grouped.length === 9) { return "lastFrame"; }
             if(acc.partial.length === 2) { return "doublet"; }
             if(acc.partial.length === 1) { return "singlet"; }

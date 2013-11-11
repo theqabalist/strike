@@ -23,8 +23,9 @@
         <tbody>
           <tr>
             <td class="sheet-outlined" ng-repeat="frame in frames" ng-class="{'sheet-disabled': isDisabledFrame($index), 'sheet-current': isCurrentFrame($index)}">
-              <input focus="!frame.first && isCurrentFrame($index)" ng-disabled="isDisabledFrame($index)" maxlength="1" type="text" class="sheet-throw readable-text sheet-cell" ng-model="frame.first" />
-              <input focus="!frame.second && frame.first && isCurrentFrame($index)" ng-disabled="isDisabledFrame($index) || frameIsAStrike($index)" maxlength="1" type="text" class="sheet-throw readable-text right sheet-cell" ng-model="frame.second" ng-class="{'sheet-disabled': frameIsAStrike($index)}" />
+              <input focus="!frame.first && isCurrentFrame($index)" ng-disabled="isDisabledCell($index,'first')" maxlength="1" type="text" class="sheet-throw readable-text sheet-cell" ng-model="frame.first" />
+              <input focus="!frame.second && frame.first && isCurrentFrame($index)" ng-disabled="isDisabledCell($index,'second')" maxlength="1" type="text" class="sheet-throw readable-text right sheet-cell" ng-model="frame.second" ng-class="{'sheet-disabled': isDisabledCell($index,'second')}" />
+              <input focus="!frame.third && frame.second && isCurrentFrame($index)" ng-disabled="isDisabledCell($index,'third')" maxlength="1" type="text" class="sheet-throw readable-text right sheet-cell" ng-model="frame.third" ng-show="$index === 9" />
               <div class="sheet-total sheet-cell readable-text">{{frame.total}}</div>
             </td>
         </tbody>

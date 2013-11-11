@@ -61,6 +61,10 @@ describe("bowling.vm", function () {
             set[0] = { first: "1", second: "2" };
 
             expect(bowling.vm.currentFrameInFrameSet(set)).toBe(1);
+
+            set[1] = set[2] = set[3] = set[4] = set[5] = set[6] = set[7] = set[8] = set[9] = set[0];
+
+            expect(bowling.vm.currentFrameInFrameSet(set)).toBe(9);
         });
     });
 
