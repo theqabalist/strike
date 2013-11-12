@@ -5,7 +5,7 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
 
         var generateEmptyFrameSet = function () {
             var frames = [];
-            _.each(_.range(10), function(){
+            _.times(10, function(){
                 frames.push({});
             });
             return frames;
@@ -138,12 +138,10 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
                 };
             },
             default_strike: function (frame) {
-                var first = parseInt(frame.first, 10) || undefined,
-                    second = first ? "/" : undefined;
-                return {
-                    first: first,
-                    second: second
-                };
+                return sanitizeNormalFrame({
+                    first: frame.first,
+                    second: "/"
+                });
             },
             default_spare: function (frame) {
                 var first = parseInt(frame.first, 10) || undefined,
@@ -216,13 +214,11 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
                 };
             },
             strike_default_strike: function (frame) {
-                var second = parseInt(frame.second, 10) || undefined,
-                    third = second ? "/" : undefined;
-                return {
+                return sanitizeTenthFrame({
                     first: frame.first,
-                    second: second,
-                    third: third
-                };
+                    second: frame.second,
+                    third: "/"
+                });
             },
             strike_default_spare: function (frame) {
                 var second = parseInt(frame.second, 10) || undefined,

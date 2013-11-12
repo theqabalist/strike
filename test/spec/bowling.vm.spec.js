@@ -24,11 +24,6 @@ describe("bowling.vm", function () {
             expect(bowling.vm.frameSetToThrows(frameSet)).toEqual([1,2,3,4]);
         });
 
-        it("should be able to convert frames with totals greater than 10 to 10 max.", function () {
-            frameSet[0] = {first: "9", second: "9"};
-            expect(bowling.vm.frameSetToThrows(frameSet)).toEqual([9,1]);
-        });
-
         it("should be able to handle 0s gracefully.", function () {
             frameSet[0] = {first: "0", second: "/"};
             expect(bowling.vm.frameSetToThrows(frameSet)).toEqual([0,10]);
@@ -91,6 +86,14 @@ describe("bowling.vm", function () {
             expect(recombined[0].total).toBe(2);
             expect(recombined[1].total).toBe(3);
             expect(recombined[2].total).toBe(undefined);
+        });
+    });
+
+    describe("bowling.vm.sanitizeFrames", function() {
+        it("should be able to conver frames with totals greater than 10 to 10 max.", function () {
+            var frameSet = bowling.vm.generateEmptyFrameSet();
+            frameSet[0] = {first: "9", second: "9"};
+            expect(bowling.vm.sanitizeFrames(frameSet)[0]).toEqual({first: 9, second: "/"});
         });
     });
 });
