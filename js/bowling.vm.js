@@ -11,15 +11,27 @@ var bowling = _.merge(bowling || {}, (function (window, _, undefined) {
             return frames;
         };
 
+        var chain = function () {
+            var item = _.first(arguments),
+                chain = _.rest(arguments);
+
+            return _.reduce(chain, function (out, func) {
+                return func(out);
+            }, item);
+        };
+
         var frameSetToThrows = function (frameset) {
-            var nestedScores = framesToScoreGroups(frameset),
-                numericGroups = specialCharactersToNumbers(nestedScores),
-                flattenedScores = _.flatten(numericGroups),
-                firstEmpty = _.findIndex(flattenedScores, function (item) {
-                    return _.isNaN(item) || _.isUndefined(item); }),
-                takeValue = firstEmpty === -1 ? 999 : firstEmpty,
-                scores = _.take(flattenedScores, takeValue);
-                return scores;
+            return chain(frameset,
+                   framesToScoreGroups,
+                   specialCharactersToNumbers,
+                   _.flatten,
+                   _.partialRight(_.reduce, function(acc, number) {
+                        if(acc.sealed || _.isNaN(number) || _.isUndefined(number)) {
+                            acc.sealed = true;
+                            return acc;
+                        }
+                        return acc.concat(number);
+                   }, []));
         };
 
         var framesToScoreGroups = function (frameset) {
